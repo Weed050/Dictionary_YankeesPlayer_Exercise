@@ -2,9 +2,11 @@ namespace GoFishing
 {
     public partial class Form1 : Form
     {
+        Random random = new Random();
         public Form1()
         {
             InitializeComponent();
+
         }
         //private Game game;
 

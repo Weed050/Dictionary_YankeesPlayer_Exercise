@@ -37,7 +37,7 @@ namespace GoFishing
                     books.Add(value);
                     for (int card = cards.Count - 1; card >= 0; card--)
                         cards.Deal(card);
-                    
+
                 }
             }
             return books;
@@ -47,16 +47,42 @@ namespace GoFishing
 
         public Deck DoYouHaveAny(Values value)
         {
-            int count;
-            count = cards.Count(c => c == card.value);
-            if (cards.ContainsValue(value))
+            Deck deckToReturn = cards.PullOutValues(value);
+            textBoxOnForm.Text +=
+                Name + " ma " + deckToReturn.Count + " " +
+                Card.Plural(value, deckToReturn.Count) + ". \n";
+            return deckToReturn;
+        }
+        public void AskForACard(List<Player> players, int myIndex, Deck stock)
+            => AskForACard(players, myIndex, stock, (Values)random.Next(1, 14));
+        //do sprawdzenia czy działa
+        
+        public void AskForACard(List<Player> players, int myIndex, Deck stock, Values value)
+        {
+            //do sprawdzenia
+            textBoxOnForm.Text = Name + " pyta, czy ktoś ma " + value + ". \n";
+            Deck deckToAdd;
+            Deck cardsAdded = new Deck(new Card[] { });
+            for (int i = 0; i < players.Count; i++)
             {
-
-                //textBoxOnForm.Text += Name+" ma "+Card.Plural()+
-                //return cards.PullOutValues(value);
-
+                if (i == myIndex)
+                {
+                    continue;
+                }
+                deckToAdd = players[i].DoYouHaveAny(value);
+                for (int z = 0; z < deckToAdd.Count - 1; z++)
+                    cardsAdded.Add(deckToAdd.Deal(z));
             }
-
+            if (cardsAdded.Count <= 0)
+            {
+                cards.Add(stock.Deal());
+                textBoxOnForm.Text = Name + " wziął kartę z kupki.";
+            }
+            else
+            {
+                for (int i = 0; i < cardsAdded.Count - 1; i++)
+                    cards.Add(cardsAdded.Deal(i));
+            }
         }
         public int CardCount { get { return cards.Count; } }
         public void TakeCard(Card card) { cards.Add(card); }

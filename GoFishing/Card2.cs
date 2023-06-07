@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GoFishing
 {
-    public partial class Card2
+    public partial class Card
     {
         private static string[] names0 = new string[]
         {
