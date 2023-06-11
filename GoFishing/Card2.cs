@@ -35,5 +35,13 @@ namespace GoFishing
 
             return names2andMore[(int)value];
         }
+        private static string[] suits = new string[] { "pik","trefl","karo","kier"};
+        private static string[] names = new string[]
+        {
+           "","As","Dwójka","Trójka","Czwórka","Piątka",
+           "Szóstka","Siódemka","Ósemka","Dziewiątka",
+           "Dziesiątka","Walet","Dama","Król"
+        };
+        public string Name { get { return names[(int)Value] + " of " + names[(int)Suit]; } }
     }
 }

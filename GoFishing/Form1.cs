@@ -37,6 +37,7 @@ namespace GoFishing
 
         private void requestCardButton_Click(object sender, EventArgs e)
         {
+            // mo¿esz zarz¹daæ pewnej karty klikaj¹c na ni¹ 2 razy (trzeba mu to przylisaæ w list boxie)
 
             //    textProgress.Text = "";
             //    if (listHand.SelectedIndex < 0)
