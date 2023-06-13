@@ -29,12 +29,12 @@ namespace GoFishing
         private void Deal()
         {
             stock.Shuffle();
-            foreach (Player player in players)
-            {
-                for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 5; i++)
+                foreach (Player player in players)
                     player.TakeCard(stock.Deal());
+            foreach (Player player in players)
                 player.PullOutBooks();
-            }
+
         }
         public bool PlayOneRound(int selectedPlayerCard)
         {
@@ -54,18 +54,34 @@ namespace GoFishing
                 // weź od innych karty odpowiadające wskazanej karcie
                 foreach (var player in players)
                 {
-                    PullOutBooks(player);
-                    if (player.CardCount == 0)
-                        for (int i = 0; i < 5; i++)
+                    //PullOutBooks(player);
+                    //if (player.CardCount == 0)
+                    //    for (int i = 0; i < 5; i++)
+                    //    {
+                    //        player.TakeCard(stock.Deal());
+                    //        if (stock.Count == 0)
+                    //        {
+                    //            textBoxOnForm.Text = "Na kupce nie ma już kart. Gra skończona!";
+                    //            return true;
+
+                    //        }
+                    //    }
+                    if (PullOutBooks(player))
+                    {
+                        textBoxOnForm.Text += player.Name + " ciągnie karty \n\r";
+                        int carD = 1;
+                        while (carD <= 5 && stock.Count > 0)
                         {
                             player.TakeCard(stock.Deal());
-                            if (stock.Count == 0)
-                            {
-                                textBoxOnForm.Text = "Na kupce nie ma już kart. Gra skończona!";
-                                return true;
-
-                            }
+                            carD++;
                         }
+                    }
+                    players[0].SortHand();
+                    if (stock.Count == 0)
+                    {
+                        textBoxOnForm.Text = "Gra skończona, na kupce nie ma żadnych kart. \r\n";
+                        return true;
+                    }
                     //jak nie ma kart to mu daj z kupki, jak się skończą na kupce to koniec gry
                 }
                 return false;
@@ -74,25 +90,23 @@ namespace GoFishing
         }
         public bool PullOutBooks(Player player)
         {
+            IEnumerable<Values> values = player.PullOutBooks();
             foreach (var player1 in players)
             {
-                IEnumerable<Values> values = player.PullOutBooks();
                 foreach (Values value in values)
                     books.Add(value, player);
             }
             if (player.CardCount == 0)
                 return true;
             //wyciąga zestawy kart, jeżeli zostały jakieś karty graczowi to zwróć false, inaczej true
-            else
-                return false;
+            return false;
         }
         public string DescribeBooks()
         {
             string strToReturn = "";
             foreach (var book in books)
-            {
-                strToReturn += book.Value.Name + " ma grupę " + book.Key + ", \n ";
-            }
+                strToReturn += book.Value.Name + " ma grupę " + Card.Plural(book.Key, 0) + ", \r\n ";
+
             return strToReturn;
         }
         public string GetWinnerName()
@@ -116,11 +130,58 @@ namespace GoFishing
             else
                 return winnersList[0].Key + ": " + winnersList[0].Value + " grupy.";
 
+            // wersja książki
+
+
+            //Dictionary<string, int> winners2 = new Dictionary<string, int>();
+            //foreach (var value in books.Keys)
+            //{
+            //    string name = books[value].Name;
+            //    if (winners2.ContainsKey(name))
+            //        winners2[name]++;
+            //    else
+            //        winners2.Add(name, 1);
+            //}
+            //int mostBooks = 0;
+            //foreach (var name in winners2.Keys)
+            //    if (winners2[name] > mostBooks)
+            //        mostBooks = winners2[name];
+
+            //bool tie = false;
+            //string winnerList = "";
+            //foreach (var name in winners2.Keys)
+            //{
+            //    if (winners2[name] == mostBooks)
+            //        if (!String.IsNullOrEmpty(winnerList))
+            //        {
+            //            winnerList += " i ";
+            //            tie = true;
+            //        }
+            //    winnerList += name;
+            //}
+            //winnerList += ": " + mostBooks + " grupy ";
+            //if (tie)
+            //    return "Remis pomiędzy " + winnerList;
+            //else
+            //    return winnerList;
+
         }
         public IEnumerable<string> GetPlayerHands() => players[0].GetCardNames();
         public string DescribePlayerHands()
         {
             string description = "";
+            for (int i = 0; i < players.Count; i++)
+            {
+                description += players[i].Name + " ma " + players[i].CardCount;
+                if (players[i].CardCount == 1)
+                    description += " kartę.\r\n";
+                if (players[i].CardCount == 2 || players[i].CardCount == 3 || players[i].CardCount == 4)
+                    description += " karty.\r\n";
+                else
+                    description += " kart.\r\n";
+            }
+            description += "Na kupce pozostało kart: " + stock.Count + Environment.NewLine;
+            return description;
 
         }
     }

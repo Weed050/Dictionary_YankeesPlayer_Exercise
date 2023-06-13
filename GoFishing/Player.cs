@@ -19,6 +19,7 @@ namespace GoFishing
             this.name = name;
             this.random = random;
             this.textBoxOnForm = textBoxOnForm;
+            this.cards = new Deck(new Card[] { });
             textBoxOnForm.Text = name + " dołączył do gry. \n";
         }
 
@@ -42,8 +43,15 @@ namespace GoFishing
             return books;
         }
         public Values GetRandomValue()
-            => (Values)this.random.Next(1, 14);
+        => cards.Peek(random.Next(cards.Count)).Value;
+        // card with random value
+        // => (Values)this.random.Next(1, 14);\
 
+        //{
+        //    Card card = cards.Peek(random.Next(cards.Count));
+        //    return card.Value;
+        //}
+        
         public Deck DoYouHaveAny(Values value)
         {
             Deck deckToReturn = cards.PullOutValues(value);
@@ -53,13 +61,21 @@ namespace GoFishing
             return deckToReturn;
         }
         public void AskForACard(List<Player> players, int myIndex, Deck stock)
-            => AskForACard(players, myIndex, stock, (Values)random.Next(1, 14));
+        {
+            if (stock.Count > 0)
+                AskForACard(players, myIndex, stock, (Values)random.Next(1, 14));
+                
+        }
+            //=> AskForACard(players, myIndex, stock, (Values)random.Next(1, 14));
         //do sprawdzenia czy działa
 
         public void AskForACard(List<Player> players, int myIndex, Deck stock, Values value)
         {
+            if (stock.Count > 0)
+            {
+
             //do sprawdzenia
-            textBoxOnForm.Text = Name + " pyta, czy ktoś ma " + value + ". \n";
+            textBoxOnForm.Text = Name + " pyta, czy ktoś ma " + Card.Plural(value,1) + ". \n";
             Deck deckToAdd;
             Deck cardsAdded = new Deck(new Card[] { });
             for (int i = 0; i < players.Count; i++)
@@ -68,8 +84,8 @@ namespace GoFishing
                     continue;
 
                 deckToAdd = players[i].DoYouHaveAny(value);
-                for (int z = 0; z < deckToAdd.Count - 1; z++)
-                    cardsAdded.Add(deckToAdd.Deal(z));
+                while (deckToAdd.Count > 0)
+                    cardsAdded.Add(deckToAdd.Deal());
             }
             if (cardsAdded.Count == 0)
             {
@@ -77,14 +93,17 @@ namespace GoFishing
                 textBoxOnForm.Text = Name + " wziął kartę z kupki. \n";
             }
             else
-                for (int i = 0; i < cardsAdded.Count - 1; i++)
+                for (int i = 0; i < cardsAdded.Count -1; i++)
                     cards.Add(cardsAdded.Deal(i));
             // dodaje karty do kart gracza
+            }
         }
         public int CardCount { get { return cards.Count; } }
         public void TakeCard(Card card) { cards.Add(card); }
         public IEnumerable<string> GetCardNames() { return cards.GetCardNames(); }
         public Card Peek(int cardNumber) { return cards.Peek(cardNumber); }
         public void SortHand() { cards.SortByValue(); }
+
+        
     }
 }
